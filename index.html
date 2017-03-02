@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>轮播</title>
+	<style type="text/css">
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		img {
+			width: 100%;
+			height: 100%;
+			border: 0;
+			font-size: 0;
+		}
+		.centent {
+			position: absolute;
+			width: 400px;
+			border: 1px solid red;
+		}
+		#main {
+			width: 400px;
+			height: 300px;
+			border: 0px solid #ddd;
+			overflow: hidden;
+		}
+		.shuffling {
+			width: 500%;
+			height: 100%;
+		}
+		.shuffling dd {
+			float: left;
+			width: 400px;
+			height: 100%;
+		}
+		
+		body {
+			height: 2000px;
+		}
+		.connection-points {
+			position: absolute;
+			bottom: 0;
+			width: 100%;
+			height: 55px;
+			border: 1px solid #93383A;
+			background: #000;
+			background:rgba(0,0,0,.8);
+			background:#000\9;
+			filter:alpha(opacity=80)\9;
+		}
+		.connection-points>dl {
+			width: 400px;
+			position:relative\9;
+		}
+		.connection-points>dl>dt {
+			width: 100%;
+			text-align: center;
+			line-height: 25px;
+		}
+		.connection-points>dl>dt a {
+			text-decoration: none;
+			font-size: 12px;
+			color: #fff;
+		}
+		.connection-points>dl>dd {
+			width: 400px;
+			height: 20px;
+			text-align: center;
+		}
+		.connection-points>dl>dd span {
+			padding: 7px;
+			margin: 0 5px;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			font-size: 0;
+			line-height: 20px;
+			vertical-align: top;
+			// vertical-align: middle;
+			cursor: pointer;
+		}
+		
+	</style>
+</head>
+<body>
+<div class="centent">
+    <div id="main">
+        <dl class="shuffling">
+            <dd><a href=""><img src="images/0.jpg" alt=""></a></dd>
+            <dd><a href=""><img src="images/1.jpg" alt=""></a></dd>
+            <dd><a href=""><img src="images/2.jpg" alt=""></a></dd>
+            <dd><a href=""><img src="images/3.jpg" alt=""></a></dd>
+        </dl>
+    </div>
+    <div id="connection-points" class="connection-points">
+    	<dl>
+    		<dt><a id="conts" href="">内容</a></dt>
+    		<dd id="points">
+            	
+            </dd>
+    	</dl>
+    </div>
+	
+</div>
+<script type="text/javascript">
+	// 获取元素
+	var main = document.getElementById('main');
+	var dl = main.getElementsByTagName("dl")[0];
+	var Dd = dl.getElementsByTagName("dd");
+	var con_pots = document.getElementById("connection-points");
+	var points = document.getElementById("points");
+	var conts = document.getElementById("conts");
+	var pPsan = points.getElementsByTagName("span");
+	
+	// 数据
+
+	var arr = ['内容1','内容2','内容3','内容4','内容5']
+	// 样式获取
+	var gets = {
+		Style: function ( Ele, attr ) {
+			if( Ele.currentStyle ) {
+				return Ele.currentStyle[attr];
+			} else {
+				return getComputedStyle(Ele,false)[attr];
+			}
+		},
+		setStyle: function ( Ele, attr, val ) {
+			Ele.style[attr] = val;
+		},
+		getchildEle: function ( parent ) {
+			var Ele = parent.childNodes;
+			var Arr = [];
+			for (var i=0; i<Ele.length; i++) {
+				if (Ele[i].nodeType===1) {
+					Arr.push( Ele[i] );
+				}
+			}
+			return Arr;
+		},
+		setAttr: function (ele, name, value) {
+			ele.setAttribute( name, value );
+			return ele;
+		},
+		getAttr: function (ele, name) {
+			return ele.getAttribute( name );
+		}
+	}
+	
+	// 轮播函数
+	function shuffling () {
+		this.clear;
+		// 要移动元素
+		this.ele = main;
+		// 移动速度
+		this.speed = 20;
+		// 移动位置
+		this.pos = 1600;
+		// 标题
+		this.titVal = arr[0];
+
+	}
+	
+	// 初始化
+	shuffling.prototype.init = function () {
+		this.creat();
+		// 开启定时器
+		this.timer(this.ele, this.pos);
+		this.Ons( this.ele );
+		this.posLocal(pPsan);
+		this.innerHtml(conts, this.titVal);
+	}
+	
+	// 创建的元素
+	shuffling.prototype.creat = function () {
+		// 创建点
+		var EleDd = this.creatEle(points, "span", Dd.length);
+		// 创建最后一个dd
+		var clonedd = this.creatEle(dl, "dd", 1);
+		var cloneimg = this.creatEle(clonedd[0], "img", 1);
+		gets.setAttr( cloneimg[0], "src", gets.getAttr( Dd[0].getElementsByTagName('img')[0], "src" ) );
+	}
+	
+	// 创建元素 
+	shuffling.prototype.creatEle = function (parend, eleName, num) {
+		var Ele = [];
+		for (var i=0; i<num; i++) {
+			Ele[i] = document.createElement(eleName);
+			this.appends(parend, Ele[i]);
+		}
+		// return [array] 返回创建的所有元素 并以数组方式返回
+		return Ele;
+	}
+	// 元素内部添加元素
+	shuffling.prototype.appends = function (parend, ele) {
+		parend.appendChild(ele);
+	}
+	shuffling.prototype.posLocal = function (ele) {
+		var This = this;
+		for (var i = 0; i<ele.length; i++) {
+			ele[i].index = i;
+			ele[i].onmouseover = function (ev) {
+				This.clearTimer();
+				// 更改内容
+				This.innerHtml(conts, arr[this.index]);
+				This.ele.scrollLeft = parseFloat(gets.Style(This.ele, "width")) * this.index;
+			}
+			ele[i].onmouseout = function () {
+				This.timer(This.ele, This.pos, This.speed);
+			}
+		}
+			
+	}
+	// 标题内容
+	shuffling.prototype.innerHtml = function (ele, val) {
+		ele.innerHTML = val;
+	}
+	// shuffling.prototype.
+	// 事件任务
+	shuffling.prototype.Ons = function (ele) {
+		var This = this;
+		ele.onmouseover = function () {
+			This.clearTimer();
+		}
+		ele.onmouseout = function () {
+			// 开启定时器
+			This.timer(This.ele, This.pos, This.speed);
+		}
+	}
+	// 开启定时器
+	shuffling.prototype.timer = function ( ele, left, sval ) {
+		var This = this;
+		this.clearTimer(); // 清除定时器
+		if (!sval) {
+			sval = 20;
+		}
+		this.clear = setInterval(function () {
+			This.positionLeft(ele, left);
+		}, sval);
+	}
+	// 清除定时器
+	shuffling.prototype.clearTimer = function () {
+		clearInterval(this.clear);
+	}
+	// 移动位置
+	shuffling.prototype.positionLeft = function (ele, Left) {
+		if (ele.scrollLeft >= Left) {
+			ele.scrollLeft = 0;
+		}
+		this.innerHtml( conts, arr[Math.floor(ele.scrollLeft / parseFloat(gets.Style(main, "width")))] );
+		ele.scrollLeft++;
+	}
+	// 实例化
+	var shuf = new shuffling ();
+	shuf.init();
+	
+	
+</script>
+</body>
+</html>
