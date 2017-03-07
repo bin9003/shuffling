@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>轮播</title>
+<style>
+	html, body, div, dl, dd, dt, img {
+		margin: 0;
+		padding: 0;
+		vertical-align: middle;
+	}
+	
+	.shuffing {
+		position: absolute;
+		width: 400px;
+		height: 225px;
+		border: 1px solid red;
+		overflow: hidden;
+	}
+	.shuffing img {
+		width: 100%;
+	}
+	.shuffing>dl:first-child {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 200%;
+	}
+	.shuffing>dl:first-child dd {
+		float: left;
+		width: 400px;
+	}
+	.shuffing>.Dl2 {
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		height: 40px;
+		text-align: center;
+		font-size: 16px;
+	}
+	.shuffing>.Dl2>dt {
+		margin: 0 5px;
+		display: inline;
+		background: #3B3939;
+		color: #F8F3F3;
+	}
+</style>
+<script type="text/javascript" src="../jquery-1.11.1.js"></script>
+</head>
+<body>
+<div class="shuffing">
+	<dl class="Dl1">
+		<dd><a href=""><img src="../images/0.jpg" alt=""></a></dd>
+		<dd><a href=""><img src="../images/1.jpg" alt=""></a></dd>
+	</dl>
+	<dl class="Dl2">
+		<dt>1</dt>
+		<dt>2</dt>
+		<dt>3</dt>
+		<dt>4</dt>
+		<dt>5</dt>
+	</dl>
+</div>
+<script>
+	function shuf() {
+		this.timer = null;
+		this.LongTime = 20;
+		this.speed = -2;
+		this.ele= ".Dl1";
+		this.direction = "left";
+		this.directionVal = 0;
+		this.EndVal = $(this.ele).width()/2;
+		this.stratVal = 0;
+		this.arrImg = ['../images/0.jpg','../images/1.jpg','../images/2.jpg','../images/3.jpg','../images/4.jpg'];
+		this.imgIndex = 0;
+		this.preEleName = ".Dl1 dd:first-child a img";
+		this.nextEleName = ".Dl1 dd:last-child a img";
+	}
+	shuf.prototype.init = function () {
+		this.theTimer();
+		this.setImg();
+	}
+	shuf.prototype.theTimer = function () {
+		var This = this;
+		this.timer = setInterval( function () {
+			$(This.ele).css(This.direction);
+			This.DetermineEnd();
+			This.pos();
+			
+		}, this.LongTime);
+	}
+	shuf.prototype.DetermineEnd = function () {
+		this.directionVal += this.speed;
+		if ( this.directionVal <= -( $(this.ele).width()/2 ) ) {
+			this.directionVal = 0;
+			this.setImg();
+		}
+	}
+	shuf.prototype.pos = function () {
+		$(this.ele).css(this.direction, this.directionVal);
+		//console.log( this.direction, this.directionVal, $(this.ele) )
+	}
+	shuf.prototype.setImg = function () {
+		
+		$( this.preEleName ).attr( "src", this.arrImg[this.imgIndex] );
+		
+		if (this.imgIndex >= this.arrImg.length-1) {
+			this.imgIndex = -1;
+		}
+		
+		$( this.nextEleName ).attr( 'src', this.arrImg[this.imgIndex+1] );
+		this.imgIndex ++;
+	}
+	var shuffing = new shuf ();
+	shuffing.init();
+</script>
+</body>
+</html>
